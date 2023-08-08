@@ -37,15 +37,18 @@ echo [32m   - xmltocsv.exe[0m
 echo [41;37m********************************************************************[0m
 echo [46;30m   - If any of the above files are missing, enter "d" to download them automatically (internet connection required)[0m
 echo [46;30m   - If the requirements are met, enter "y" to initiate the testing process[0m
+echo [46;30m   - enter "u" to update this script[0m
 echo [41;37m********************************************************************[0m
-echo [32mFor further information, visit: https://github.com/ltycn/BenchmarkScripts[0m
+echo [32mFor further information, visit: https://github.com/ltycn/lnvpe-tool/BenchmarkScripts[0m
 
 
 set /p "confirmation=Enter your Choice: "
 
 if "%confirmation%"=="y" (
     goto :runbench
-) else if "%confirmation%"=="d" (
+)else if "%confirmation%"=="u" (
+    goto :update
+)else if "%confirmation%"=="d" (
     goto :download
 ) else (
     exit
@@ -54,16 +57,23 @@ if "%confirmation%"=="y" (
 pause
 exit
 
+:update
+echo Updating...
+powershell -Command "(New-Object System.Net.WebClient).DownloadFile('https://dl.lnvpe.com/BenchmarkScipts/3DMark/3DMarkBench_ITS.bat', '%USERPROFILE%\Desktop\3DMarkBench_ITS.bat')"
+echo Update completed, File saved to %USERPROFILE%\Desktop\3DMarkBench_ITS.bat
+pause
+exit /b 0
+
 :download
 REM Create logtool directory on the desktop if it doesn't exist
 if not exist "%logtool%" mkdir "%logtool%" 2>nul
 
 REM Download four files and save them in the logtool directory
-powershell -Command "(New-Object System.Net.WebClient).DownloadFile('https://dl.lnvpe.com/ServiceControl.exe', '%USERPROFILE%\Desktop\logtool\ServiceControl.exe')"
-powershell -Command "(New-Object System.Net.WebClient).DownloadFile('https://dl.lnvpe.com/ML_Scenario.exe', '%USERPROFILE%\Desktop\logtool\ML_Scenario.exe')"
-powershell -Command "(New-Object System.Net.WebClient).DownloadFile('https://dl.lnvpe.com/LenovoIPF.dll', '%USERPROFILE%\Desktop\logtool\LenovoIPF.dll')"
-powershell -Command "(New-Object System.Net.WebClient).DownloadFile('https://dl.lnvpe.com/LenovoCamera.dll', '%USERPROFILE%\Desktop\logtool\LenovoCamera.dll')"
-powershell -Command "(New-Object System.Net.WebClient).DownloadFile('https://dl.lnvpe.com/xmltocsv.exe', '%USERPROFILE%\Desktop\logtool\xmltocsv.exe')"
+powershell -Command "(New-Object System.Net.WebClient).DownloadFile('https://dl.lnvpe.com/logtool/ServiceControl.exe', '%USERPROFILE%\Desktop\logtool\ServiceControl.exe')"
+powershell -Command "(New-Object System.Net.WebClient).DownloadFile('https://dl.lnvpe.com/logtool/ML_Scenario.exe', '%USERPROFILE%\Desktop\logtool\ML_Scenario.exe')"
+powershell -Command "(New-Object System.Net.WebClient).DownloadFile('https://dl.lnvpe.com/logtool/LenovoIPF.dll', '%USERPROFILE%\Desktop\logtool\LenovoIPF.dll')"
+powershell -Command "(New-Object System.Net.WebClient).DownloadFile('https://dl.lnvpe.com/logtool/LenovoCamera.dll', '%USERPROFILE%\Desktop\logtool\LenovoCamera.dll')"
+powershell -Command "(New-Object System.Net.WebClient).DownloadFile('https://dl.lnvpe.com/logtool/xmltocsv.exe', '%USERPROFILE%\Desktop\logtool\xmltocsv.exe')"
 powershell -Command "(New-Object System.Net.WebClient).DownloadFile('https://dl.lnvpe.com/logtool/DSPi.exe', '%USERPROFILE%\Desktop\logtool\DSPi.exe')"
 
 echo Download complete, press enter to test...

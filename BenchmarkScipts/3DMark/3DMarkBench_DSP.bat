@@ -37,15 +37,18 @@ echo [32m   - xmltocsv.exe[0m
 echo [41;37m********************************************************************[0m
 echo [46;30m   - If any of the above files are missing, enter "d" to download them automatically (internet connection required)[0m
 echo [46;30m   - If the requirements are met, enter "y" to initiate the testing process[0m
+echo [46;30m   - enter "u" to update this script[0m
 echo [41;37m********************************************************************[0m
-echo [32mFor further information, visit: https://github.com/ltycn/BenchmarkScripts[0m
+echo [32mFor further information, visit: https://github.com/ltycn/lnvpe-tool/BenchmarkScripts[0m
 
 
 set /p "confirmation=Enter your Choice: "
 
 if "%confirmation%"=="y" (
     goto :runbench
-) else if "%confirmation%"=="d" (
+)else if "%confirmation%"=="u" (
+    goto :update
+)else if "%confirmation%"=="d" (
     goto :download
 ) else (
     exit
@@ -53,6 +56,13 @@ if "%confirmation%"=="y" (
 
 pause
 exit
+
+:update
+echo Updating...
+powershell -Command "(New-Object System.Net.WebClient).DownloadFile('https://dl.lnvpe.com/BenchmarkScipts/3DMark/3DMarkBench_DSP.bat', '%USERPROFILE%\Desktop\3DMarkBench_DSP.bat')"
+echo Update completed, File saved to %USERPROFILE%\Desktop\3DMarkBench_DSP.bat
+pause
+exit /b 0
 
 :download
 REM Create logtool directory on the desktop if it doesn't exist
