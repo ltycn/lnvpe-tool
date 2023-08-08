@@ -61,7 +61,7 @@ exit
 echo Updating...
 powershell -Command "(New-Object System.Net.WebClient).DownloadFile('https://dl.lnvpe.com/BenchmarkScipts/3DMark/3DMarkBench_ITS.bat', '%USERPROFILE%\Desktop\3DMarkBench_ITS.bat')"
 echo Update completed, File saved to %USERPROFILE%\Desktop\3DMarkBench_ITS.bat
-echo Please restart this batch file!
+echo Please restart this batch file^!
 pause
 exit /b 0
 
@@ -127,7 +127,7 @@ for %%a in (135 148) do (
     timeout /t 20 > nul
 
     taskkill /F /IM "PTAT.exe" /IM "ML_Scenario.exe"
-    echo Successfully terminate PTAT and ML_Scenario!
+    echo Successfully terminate PTAT and ML_Scenario^!
 
     move /Y "%USERPROFILE%\Documents\iPTAT\log\its-!logname!-ptat.csv" "%logpath%"
 )
