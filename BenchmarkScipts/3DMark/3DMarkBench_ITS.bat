@@ -17,7 +17,7 @@ rem You can change this configuration below:
 set "looptimes=5"
 set "pauseduration=180"
 
-rem if you set looptimes=5, then it will run totally 5*4=20 times (ITS-Balance ITS-EPM & DSP-Intelligent DSP-EPM)
+rem if you set looptimes=5, then it will run totally 5*2=100 times (ITS-Balance ITS-EPM)
 rem ========================================
 
 @echo off
