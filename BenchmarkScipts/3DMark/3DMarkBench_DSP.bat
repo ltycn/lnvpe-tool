@@ -59,11 +59,11 @@ REM Create logtool directory on the desktop if it doesn't exist
 if not exist "%logtool%" mkdir "%logtool%" 2>nul
 
 REM Download four files and save them in the logtool directory
-powershell -Command "(New-Object System.Net.WebClient).DownloadFile('https://dl.lnvpe.com/ServiceControl.exe', '%USERPROFILE%\Desktop\logtool\ServiceControl.exe')"
-powershell -Command "(New-Object System.Net.WebClient).DownloadFile('https://dl.lnvpe.com/ML_Scenario.exe', '%USERPROFILE%\Desktop\logtool\ML_Scenario.exe')"
-powershell -Command "(New-Object System.Net.WebClient).DownloadFile('https://dl.lnvpe.com/LenovoIPF.dll', '%USERPROFILE%\Desktop\logtool\LenovoIPF.dll')"
-powershell -Command "(New-Object System.Net.WebClient).DownloadFile('https://dl.lnvpe.com/LenovoCamera.dll', '%USERPROFILE%\Desktop\logtool\LenovoCamera.dll')"
-powershell -Command "(New-Object System.Net.WebClient).DownloadFile('https://dl.lnvpe.com/xmltocsv.exe', '%USERPROFILE%\Desktop\logtool\xmltocsv.exe')"
+powershell -Command "(New-Object System.Net.WebClient).DownloadFile('https://dl.lnvpe.com/logtool/ServiceControl.exe', '%USERPROFILE%\Desktop\logtool\ServiceControl.exe')"
+powershell -Command "(New-Object System.Net.WebClient).DownloadFile('https://dl.lnvpe.com/logtool/ML_Scenario.exe', '%USERPROFILE%\Desktop\logtool\ML_Scenario.exe')"
+powershell -Command "(New-Object System.Net.WebClient).DownloadFile('https://dl.lnvpe.com/logtool/LenovoIPF.dll', '%USERPROFILE%\Desktop\logtool\LenovoIPF.dll')"
+powershell -Command "(New-Object System.Net.WebClient).DownloadFile('https://dl.lnvpe.com/logtool/LenovoCamera.dll', '%USERPROFILE%\Desktop\logtool\LenovoCamera.dll')"
+powershell -Command "(New-Object System.Net.WebClient).DownloadFile('https://dl.lnvpe.com/logtool/xmltocsv.exe', '%USERPROFILE%\Desktop\logtool\xmltocsv.exe')"
 powershell -Command "(New-Object System.Net.WebClient).DownloadFile('https://dl.lnvpe.com/logtool/DSPi.exe', '%USERPROFILE%\Desktop\logtool\DSPi.exe')"
 
 
