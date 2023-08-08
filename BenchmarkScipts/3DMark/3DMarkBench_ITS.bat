@@ -11,6 +11,15 @@ set "_3DMarkPath=C:\Program Files\UL\3DMark"
 set "logrootpath=%USERPROFILE%\Desktop\log"
 set "logtool=%USERPROFILE%\Desktop\logtool"
 
+rem ========================================
+rem You can change this configuration below:
+
+set "looptimes=5"
+set "pauseduration=180"
+
+rem if you set looptimes=5, then it will run totally 5*4=20 times (ITS-Balance ITS-EPM & DSP-Intelligent DSP-EPM)
+rem ========================================
+
 @echo off
 color 0f
 
@@ -115,12 +124,12 @@ for %%a in (135 148) do (
 
     timeout /t 20 > nul
 
-    for /L %%i IN (1, 1, 5) do (
+    for /L %%i IN (1, 1, %looptimes%) do (
         echo Let's go^!
-        echo =====[ Current Mode: !logname! ]==== Start Testing... =========[ %%i of 5 ]=========
+        echo =====[ Current Mode: !logname! ]==== Start Testing... =========[ %%i of %looptimes% ]=========
         "%_3DMarkPath%\3DMarkCmd.exe" "--definition=timespy.3dmdef" "--out=%logpath%\3dm-result\ITS-!logname!-%%i.3dmark-result" "--export=%logpath%\3dm-result\ITS-!logname!-%%i.xml"
         echo =============================== End Testing... ===============================
-        echo Take a break...for 3 mins...
+        echo Take a break...for %pauseduration% seconds...
         timeout /t 180 > nul
     )
 
