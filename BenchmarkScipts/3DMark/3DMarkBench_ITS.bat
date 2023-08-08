@@ -61,6 +61,7 @@ exit
 echo Updating...
 powershell -Command "(New-Object System.Net.WebClient).DownloadFile('https://dl.lnvpe.com/BenchmarkScipts/3DMark/3DMarkBench_ITS.bat', '%USERPROFILE%\Desktop\3DMarkBench_ITS.bat')"
 echo Update completed, File saved to %USERPROFILE%\Desktop\3DMarkBench_ITS.bat
+echo Please restart this batch file!
 pause
 exit /b 0
 
