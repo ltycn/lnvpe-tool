@@ -31,21 +31,21 @@ for /L %%i IN (1,1,%multicore-looptimes%) do (
 
 echo Running three single core tests...
 for /L %%i IN (1,1,%singlecore-looptimes%) do (
-  echo Cinebench Single Core Run #%%i of 3... >> %logname%.txt
+  echo Cinebench Single Core Run #%%i of %singlecore-looptimes%... >> %logname%.txt
   start /b /wait "CinebenchBatch Window" cmd.exe /C "%CinebenchPath% g_CinebenchCpuXTest=false g_CinebenchCpu1Test=true g_CinebenchMinimumTestDuration=1 >> %logname%.txt"
   timeout /t %pauseduration% /nobreak
 )
 
 ::====Muti-Core Warm Test==============================================================
 
-echo Running 10 minute multicore test...
-start /b /wait "CinebenchBatch Window" cmd.exe /C "%CinebenchPath% g_CinebenchCpuXTest=true g_CinebenchCpu1Test=false g_CinebenchMinimumTestDuration=600 >> %logname%.txt"
-timeout /t 120 /nobreak
+rem echo Running 10 minute multicore test...
+rem start /b /wait "CinebenchBatch Window" cmd.exe /C "%CinebenchPath% g_CinebenchCpuXTest=true g_CinebenchCpu1Test=false g_CinebenchMinimumTestDuration=600 >> %logname%.txt"
+rem timeout /t 120 /nobreak
 
 ::====Single-Core Warm Test============================================================
 
-echo Running 10 minute single core test...
-start /b /wait "CinebenchBatch Window" cmd.exe /C "%CinebenchPath% g_CinebenchCpuXTest=false g_CinebenchCpu1Test=true g_CinebenchMinimumTestDuration=600 >> %logname%.txt"
+rem echo Running 10 minute single core test...
+rem start /b /wait "CinebenchBatch Window" cmd.exe /C "%CinebenchPath% g_CinebenchCpuXTest=false g_CinebenchCpu1Test=true g_CinebenchMinimumTestDuration=600 >> %logname%.txt"
 
 ::=====================================================================================
 
