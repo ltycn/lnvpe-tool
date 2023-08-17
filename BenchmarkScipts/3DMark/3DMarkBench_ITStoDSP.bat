@@ -23,6 +23,7 @@ rem ========================================
 @echo off
 color 0f
 
+rem ============ Information ============
 echo [41;37m***** This is an automated 3DMark testing script *****[0m
 echo [46;30mFunctions:[0m
 echo [32m1. Evaluates 3DMark performance in both Intelligent and EPM modes of ITS.[0m
@@ -50,6 +51,13 @@ echo [46;30m   - enter "u" to update this script[0m
 echo [41;37m********************************************************************[0m
 echo [32mFor further information, visit: https://github.com/ltycn/lnvpe-tool/BenchmarkScripts[0m
 
+rem Prevent PC goes into sleep
+powercfg /change standby-timeout-ac 0
+powercfg /change standby-timeout-dc 0
+powercfg /change hibernate-timeout-ac 0
+powercfg /change hibernate-timeout-dc 0
+powercfg /change monitor-timeout-ac 0
+powercfg /change monitor-timeout-dc 0
 
 set /p "confirmation=Enter your Choice: "
 
@@ -92,6 +100,22 @@ pause
 if not exist "%logrootpath%" (
     mkdir "%logrootpath%"
 )
+
+rem ======================================================================
+rem Change Dispatcher active staus to disable, start up ITS
+cd c:\windows\system32
+TIMEOUT /T 5
+sc stop LenovoProcessManagement
+TIMEOUT /T 5
+SC config LenovoProcessManagement start=disabled
+TIMEOUT /T 5
+
+SC config LITSSVC start=auto
+TIMEOUT /T 5
+sc start LITSSVC
+TIMEOUT /T 5
+rem ======================================================================
+
 for /f "tokens=2 delims==" %%a in ('wmic OS Get localdatetime /value') do set "dt=%%a"
 
 set "year=%dt:~0,4%"
@@ -101,23 +125,9 @@ set "hour=%dt:~8,2%"
 set "minute=%dt:~10,2%"
 
 
-cd c:\windows\system32
-TIMEOUT /T 10
-sc stop LenovoProcessManagement
-TIMEOUT /T 10
-SC config LenovoProcessManagement start=disabled
-TIMEOUT /T 10
-
-SC config LITSSVC start=auto
-TIMEOUT /T 10
-sc start LITSSVC
-TIMEOUT /T 10
-
-
-set "ITSlogpath=%logrootpath%\3DMark-%month%%day%%hour%%minute%-ITS"
-set "DSPlogpath=%logrootpath%\3DMark-%month%%day%%hour%%minute%-DSP"
+set "ITSlogpath=%logrootpath%\3DMark\ITS-%month%%day%%hour%%minute%"
 mkdir "%ITSlogpath%"
-mkdir "%ITSlogpath%\3dm-result"
+mkdir "%ITSlogpath%\log"
 cd %ITSlogpath%
 
 
@@ -138,7 +148,7 @@ for %%a in (135 148) do (
     echo Launching PTAT...
     start /min "" "%PTAT%" "-m=ITS-!logname!-PTAT.csv" "-noappend" "-l=r"
     echo Launching ML_Scenario...
-    start /min cmd /c "%logtool%\ML_Scenario.exe -delay 1 -logname ITS-!logname!-ML.csv -count 4000 -logonly"
+    start /min cmd /c "%logtool%\ML_Scenario.exe -delay 1 -logname %ITSlogpath%\log\ITS-!logname!-ML.csv -count 8000 -logonly"
     echo All done, Please wait for a while...
 
     timeout /t 20 > nul
@@ -146,7 +156,7 @@ for %%a in (135 148) do (
     for /L %%i IN (1, 1, %looptimes%) do (
         echo Let's go^!
         echo =====[ Current Mode: !logname! ]==== Start Testing... =========[ %%i of %looptimes% ]=========
-        "%_3DMarkPath%\3DMarkCmd.exe" "--definition=timespy.3dmdef" "--out=%ITSlogpath%\3dm-result\ITS-!logname!-%%i.3dmark-result" "--export=%ITSlogpath%\3dm-result\ITS-!logname!-%%i.xml"
+        "%_3DMarkPath%\3DMarkCmd.exe" "--definition=timespy.3dmdef" "--out=%ITSlogpath%\ITS-!logname!-%%i.3dmark-result" "--export=%ITSlogpath%\ITS-!logname!-%%i.xml"
         echo =============================== End Testing... ===============================
         echo Take a break...for %pauseduration% seconds...
         timeout /t %pauseduration% > nul
@@ -157,29 +167,32 @@ for %%a in (135 148) do (
     taskkill /F /IM "PTAT.exe" /IM "ML_Scenario.exe"
     echo Successfully terminate PTAT and ML_Scenario^!
 
-    move /Y "%USERPROFILE%\Documents\iPTAT\log\its-!logname!-ptat.csv" "%ITSlogpath%"
+    move /Y "%USERPROFILE%\Documents\iPTAT\log\its-!logname!-ptat.csv" "%ITSlogpath%\log"
 )
 
 rem ======================================================================
-rem Change ITS active staus to disable, start up Lenovo Process Management
+rem Change ITS active staus to disable, start up Dispatcher
 
 %logtool%Servicecontrol.exe control LITSSVC 135
+TIMEOUT /T 5
+
 cd c:\windows\system32
-TIMEOUT /T 10
+TIMEOUT /T 5
 sc stop LITSSVC
-TIMEOUT /T 10
+TIMEOUT /T 5
 SC config LITSSVC start=disabled
-TIMEOUT /T 10
+TIMEOUT /T 5
 
 SC config LenovoProcessManagement start=auto
-TIMEOUT /T 10
+TIMEOUT /T 5
 sc start LenovoProcessManagement
-TIMEOUT /T 10
-
+TIMEOUT /T 5
 rem ======================================================================
 
+
+set "DSPlogpath=%logrootpath%\3DMark\DSP-%month%%day%%hour%%minute%"
 mkdir "%DSPlogpath%"
-mkdir "%DSPlogpath%\3dm-result"
+mkdir "%DSPlogpath%\log"
 cd %DSPlogpath%
 
 rem ======================================================================
@@ -199,7 +212,7 @@ for %%a in (163 165) do (
     echo Launching PTAT...
     start /min "" "%PTAT%" "-m=DSP-!logname!-PTAT.csv" "-noappend" "-l=r"
     echo Launching ML_Scenario...
-    start /min cmd /c "%logtool%\ML_Scenario.exe -delay 1 -logname DSP-!logname!-ML.csv -count 4000 -logonly"
+    start /min cmd /c "%logtool%\ML_Scenario.exe -delay 1 -logname %DSPlogpath%\log\DSP-!logname!-ML.csv -count 8000 -logonly"
     echo All done, Please wait for a while...
 
     timeout /t 20 > nul
@@ -207,7 +220,7 @@ for %%a in (163 165) do (
     for /L %%i IN (1, 1, %looptimes%) do (
         echo Let's go^!
         echo =====[ Current Mode: !logname! ]==== Start Testing... =========[ %%i of %looptimes% ]=========
-        "%_3DMarkPath%\3DMarkCmd.exe" "--definition=timespy.3dmdef" "--out=%DSPlogpath%\3dm-result\DSP-!logname!-%%i.3dmark-result" "--export=%DSPlogpath%\3dm-result\DSP-!logname!-%%i.xml"
+        "%_3DMarkPath%\3DMarkCmd.exe" "--definition=timespy.3dmdef" "--out=%DSPlogpath%\DSP-!logname!-%%i.3dmark-result" "--export=%DSPlogpath%\DSP-!logname!-%%i.xml"
         echo =============================== End Testing... ===============================
         echo Take a break...for %pauseduration% seconds...
         timeout /t %pauseduration% > nul
@@ -218,7 +231,7 @@ for %%a in (163 165) do (
     taskkill /F /IM "PTAT.exe" /IM "ML_Scenario.exe"
     echo Successfully terminate PTAT and ML_Scenario^!
 
-    move /Y "%USERPROFILE%\Documents\iPTAT\log\dsp-!logname!-ptat.csv" "%DSPlogpath%"
+    move /Y "%USERPROFILE%\Documents\iPTAT\log\dsp-!logname!-ptat.csv" "%DSPlogpath%\log"
 )
 
 pause

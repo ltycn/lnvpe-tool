@@ -17,12 +17,13 @@ rem You can change this configuration below:
 set "looptimes=5"
 set "pauseduration=180"
 
-rem if you set looptimes=5, then it will run totally 5*2=100 times (ITS-Balance ITS-EPM)
+rem if you set looptimes=5, then it will run totally 5*4=20 times (ITS-Balance ITS-EPM & DSP-Intelligent DSP-EPM)
 rem ========================================
 
 @echo off
 color 0f
 
+rem ============ Information ============
 echo [41;37m***** This is an automated 3DMark testing script *****[0m
 echo [46;30mFunctions:[0m
 echo [32m1. Evaluates 3DMark performance in both Intelligent and EPM modes of ITS.[0m
@@ -75,9 +76,9 @@ exit
 
 :update
 echo Updating...
-powershell -Command "(New-Object System.Net.WebClient).DownloadFile('https://dl.lnvpe.com/BenchmarkScipts/3DMark/3DMarkBench_ITS.bat', '%USERPROFILE%\Desktop\3DMarkBench_ITS.bat')"
-echo Update completed, File saved to %USERPROFILE%\Desktop\3DMarkBench_ITS.bat
-echo Please restart this batch file^!
+powershell -Command "(New-Object System.Net.WebClient).DownloadFile('https://dl.lnvpe.com/BenchmarkScipts/3DMark/3DMarkBench_ITStoDSP.bat', '%USERPROFILE%\Desktop\3DMarkBench_ITStoDSP.bat')"
+echo Update completed, File saved to %USERPROFILE%\Desktop\3DMarkBench_ITStoDSP.bat
+echo Please restart this batch file……!
 pause
 exit /b 0
 
@@ -92,7 +93,6 @@ powershell -Command "(New-Object System.Net.WebClient).DownloadFile('https://dl.
 powershell -Command "(New-Object System.Net.WebClient).DownloadFile('https://dl.lnvpe.com/logtool/LenovoCamera.dll', '%USERPROFILE%\Desktop\logtool\LenovoCamera.dll')"
 powershell -Command "(New-Object System.Net.WebClient).DownloadFile('https://dl.lnvpe.com/logtool/xmltocsv.exe', '%USERPROFILE%\Desktop\logtool\xmltocsv.exe')"
 powershell -Command "(New-Object System.Net.WebClient).DownloadFile('https://dl.lnvpe.com/logtool/DSPi.exe', '%USERPROFILE%\Desktop\logtool\DSPi.exe')"
-
 echo Download complete, press enter to test...
 pause
 
@@ -101,8 +101,10 @@ if not exist "%logrootpath%" (
     mkdir "%logrootpath%"
 )
 
-rem Make sure service status is correct
+rem ======================================================================
+rem Change Dispatcher active staus to disable, start up ITS
 cd c:\windows\system32
+TIMEOUT /T 5
 sc stop LenovoProcessManagement
 TIMEOUT /T 5
 SC config LenovoProcessManagement start=disabled
@@ -112,6 +114,7 @@ SC config LITSSVC start=auto
 TIMEOUT /T 5
 sc start LITSSVC
 TIMEOUT /T 5
+rem ======================================================================
 
 for /f "tokens=2 delims==" %%a in ('wmic OS Get localdatetime /value') do set "dt=%%a"
 
@@ -121,10 +124,16 @@ set "day=%dt:~6,2%"
 set "hour=%dt:~8,2%"
 set "minute=%dt:~10,2%"
 
-set "logpath=%logrootpath%\%month%%day%%hour%%minute%"
-mkdir "%logpath%"
-mkdir "%logpath%\3dm-result"
-cd %logpath%
+
+set "ITSlogpath=%logrootpath%\3DMark-log\ITS-%month%%day%%hour%%minute%"
+mkdir "%ITSlogpath%"
+mkdir "%ITSlogpath%\log"
+cd %ITSlogpath%
+
+
+rem ======================================================================
+rem start ITS test. BSM=146 EPM=148 Auto=135 
+
 for %%a in (135 148) do (
 
     %logtool%\Servicecontrol.exe control LITSSVC %%a
@@ -139,7 +148,7 @@ for %%a in (135 148) do (
     echo Launching PTAT...
     start /min "" "%PTAT%" "-m=ITS-!logname!-PTAT.csv" "-noappend" "-l=r"
     echo Launching ML_Scenario...
-    start /min cmd /c "%logtool%\ML_Scenario.exe -delay 1 -logname ITS-!logname!-ML.csv -count 8000 -logonly"
+    start /min cmd /c "%logtool%\ML_Scenario.exe -delay 1 -logname %ITSlogpath%\log\ITS-!logname!-ML.csv -count 8000 -logonly"
     echo All done, Please wait for a while...
 
     timeout /t 20 > nul
@@ -147,10 +156,10 @@ for %%a in (135 148) do (
     for /L %%i IN (1, 1, %looptimes%) do (
         echo Let's go^!
         echo =====[ Current Mode: !logname! ]==== Start Testing... =========[ %%i of %looptimes% ]=========
-        "%_3DMarkPath%\3DMarkCmd.exe" "--definition=timespy.3dmdef" "--out=%logpath%\3dm-result\ITS-!logname!-%%i.3dmark-result" "--export=%logpath%\3dm-result\ITS-!logname!-%%i.xml"
+        "%_3DMarkPath%\3DMarkCmd.exe" "--definition=timespy.3dmdef" "--out=%ITSlogpath%\ITS-!logname!-%%i.3dmark-result" "--export=%ITSlogpath%\ITS-!logname!-%%i.xml"
         echo =============================== End Testing... ===============================
         echo Take a break...for %pauseduration% seconds...
-        timeout /t 180 > nul
+        timeout /t %pauseduration% > nul
     )
 
     timeout /t 20 > nul
@@ -158,11 +167,72 @@ for %%a in (135 148) do (
     taskkill /F /IM "PTAT.exe" /IM "ML_Scenario.exe"
     echo Successfully terminate PTAT and ML_Scenario^!
 
-    move /Y "%USERPROFILE%\Documents\iPTAT\log\its-!logname!-ptat.csv" "%logpath%"
+    move /Y "%USERPROFILE%\Documents\iPTAT\log\its-!logname!-ptat.csv" "%ITSlogpath%\log"
 )
 
-explorer %logpath%
-"%logtool%\xmltocsv.exe" "%logpath%\3dm-result"
+rem ======================================================================
+rem Change ITS active staus to disable, start up Dispatcher
+
+%logtool%Servicecontrol.exe control LITSSVC 135
+TIMEOUT /T 5
+
+cd c:\windows\system32
+TIMEOUT /T 5
+sc stop LITSSVC
+TIMEOUT /T 5
+SC config LITSSVC start=disabled
+TIMEOUT /T 5
+
+SC config LenovoProcessManagement start=auto
+TIMEOUT /T 5
+sc start LenovoProcessManagement
+TIMEOUT /T 5
+rem ======================================================================
+
+
+set "DSPlogpath=%logrootpath%\3DMark-log\DSP-%month%%day%%hour%%minute%"
+mkdir "%DSPlogpath%"
+mkdir "%DSPlogpath%\log"
+cd %DSPlogpath%
+
+rem ======================================================================
+rem start Dispatcer test. BSM=164/0xA4, Inteligent=163/0xA3, EPM=165/0xa5
+
+for %%a in (163 165) do (
+
+    %logtool%\Servicecontrol.exe control LenovoProcessManagement %%a
+
+    if %%a==163 (
+        set "logname=INT"
+        echo Successfully set Dispatcher to [ Intelligent Mode ]
+    ) else if %%a==165 (
+        set "logname=EPM"
+        echo Successfully set Dispatcher to [ EPM Mode ]
+    )
+    echo Launching PTAT...
+    start /min "" "%PTAT%" "-m=DSP-!logname!-PTAT.csv" "-noappend" "-l=r"
+    echo Launching ML_Scenario...
+    start /min cmd /c "%logtool%\ML_Scenario.exe -delay 1 -logname %DSPlogpath%\log\DSP-!logname!-ML.csv -count 8000 -logonly"
+    echo All done, Please wait for a while...
+
+    timeout /t 20 > nul
+
+    for /L %%i IN (1, 1, %looptimes%) do (
+        echo Let's go^!
+        echo =====[ Current Mode: !logname! ]==== Start Testing... =========[ %%i of %looptimes% ]=========
+        "%_3DMarkPath%\3DMarkCmd.exe" "--definition=timespy.3dmdef" "--out=%DSPlogpath%\DSP-!logname!-%%i.3dmark-result" "--export=%DSPlogpath%\DSP-!logname!-%%i.xml"
+        echo =============================== End Testing... ===============================
+        echo Take a break...for %pauseduration% seconds...
+        timeout /t %pauseduration% > nul
+    )
+
+    timeout /t 20 > nul
+
+    taskkill /F /IM "PTAT.exe" /IM "ML_Scenario.exe"
+    echo Successfully terminate PTAT and ML_Scenario^!
+
+    move /Y "%USERPROFILE%\Documents\iPTAT\log\dsp-!logname!-ptat.csv" "%DSPlogpath%\log"
+)
 
 pause
 

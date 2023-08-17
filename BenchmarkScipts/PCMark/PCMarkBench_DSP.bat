@@ -7,7 +7,7 @@ if not "%1"=="am_admin" (
 )
 
 set "PTAT=C:\Program Files\Intel Corporation\Intel(R)PTAT\PTAT.exe"
-set "_3DMarkPath=C:\Program Files\UL\3DMark"
+set "PCMarkPath=C:\Program Files\UL\PCMark 10"
 set "logrootpath=%USERPROFILE%\Desktop\log"
 set "logtool=%USERPROFILE%\Desktop\logtool"
 
@@ -16,16 +16,17 @@ rem You can change this configuration below:
 
 set "looptimes=5"
 set "pauseduration=180"
+set "definitionfile=pcm10_benchmark.pcmdef"
 
-rem if you set looptimes=5, then it will run totally 5*2=100 times (ITS-Balance ITS-EPM)
+rem if you set looptimes=5, then it will run totally 5*2=10 times (IDSP-Intelligent DSP-EPM)
 rem ========================================
 
 @echo off
 color 0f
 
-echo [41;37m***** This is an automated 3DMark testing script *****[0m
+echo [41;37m***** This is an automated PCMark testing script *****[0m
 echo [46;30mFunctions:[0m
-echo [32m1. Evaluates 3DMark performance in both Intelligent and EPM modes of ITS.[0m
+echo [32m1. Evaluates PCMark performance in both Intelligent and EPM modes of Dispatcher.[0m
 echo [32m2. Captures performance parameters using PTAT and ML_Scenario[0m
 echo [32m3. Test execution process:[0m
 echo [32m   - Switches Dispatcher mode to Intelligent[0m
@@ -36,7 +37,7 @@ echo [32m   - Enables Logs (PTAT, ML_Scenario)[0m
 echo [32m   - Starts testing (default: three cycles with a 3-minute interval)[0m
 echo [32m   - Organizes and completes the logging[0m
 echo [43;30mTo ensure the script runs correctly, please meet these requirements:[0m
-echo [32m1. 3DMark and PTAT are installed in their default paths.[0m
+echo [32m1. PCMark and PTAT are installed in their default paths.[0m
 echo [32m2. The desktop contains a "logtool" folder, which includes the following files:[0m
 echo [32m   - ML_Scenario.exe[0m
 echo [32m   - LenovoIPF.dll[0m
@@ -58,6 +59,7 @@ powercfg /change hibernate-timeout-dc 0
 powercfg /change monitor-timeout-ac 0
 powercfg /change monitor-timeout-dc 0
 
+
 set /p "confirmation=Enter your Choice: "
 
 if "%confirmation%"=="y" (
@@ -75,8 +77,8 @@ exit
 
 :update
 echo Updating...
-powershell -Command "(New-Object System.Net.WebClient).DownloadFile('https://dl.lnvpe.com/BenchmarkScipts/3DMark/3DMarkBench_ITS.bat', '%USERPROFILE%\Desktop\3DMarkBench_ITS.bat')"
-echo Update completed, File saved to %USERPROFILE%\Desktop\3DMarkBench_ITS.bat
+powershell -Command "(New-Object System.Net.WebClient).DownloadFile('https://dl.lnvpe.com/BenchmarkScipts/PCMark/PCMarkBench_DSP.bat', '%USERPROFILE%\Desktop\3DMarkBench_DSP.bat')"
+echo Update completed, File saved to %USERPROFILE%\Desktop\PCMarkBench_DSP.bat
 echo Please restart this batch file^!
 pause
 exit /b 0
@@ -93,6 +95,7 @@ powershell -Command "(New-Object System.Net.WebClient).DownloadFile('https://dl.
 powershell -Command "(New-Object System.Net.WebClient).DownloadFile('https://dl.lnvpe.com/logtool/xmltocsv.exe', '%USERPROFILE%\Desktop\logtool\xmltocsv.exe')"
 powershell -Command "(New-Object System.Net.WebClient).DownloadFile('https://dl.lnvpe.com/logtool/DSPi.exe', '%USERPROFILE%\Desktop\logtool\DSPi.exe')"
 
+
 echo Download complete, press enter to test...
 pause
 
@@ -100,19 +103,6 @@ pause
 if not exist "%logrootpath%" (
     mkdir "%logrootpath%"
 )
-
-rem Make sure service status is correct
-cd c:\windows\system32
-sc stop LenovoProcessManagement
-TIMEOUT /T 5
-SC config LenovoProcessManagement start=disabled
-TIMEOUT /T 5
-
-SC config LITSSVC start=auto
-TIMEOUT /T 5
-sc start LITSSVC
-TIMEOUT /T 5
-
 for /f "tokens=2 delims==" %%a in ('wmic OS Get localdatetime /value') do set "dt=%%a"
 
 set "year=%dt:~0,4%"
@@ -121,25 +111,25 @@ set "day=%dt:~6,2%"
 set "hour=%dt:~8,2%"
 set "minute=%dt:~10,2%"
 
-set "logpath=%logrootpath%\%month%%day%%hour%%minute%"
+set "logpath=%logrootpath%\PCMark-log\%month%%day%%hour%%minute%"
 mkdir "%logpath%"
-mkdir "%logpath%\3dm-result"
 cd %logpath%
-for %%a in (135 148) do (
 
-    %logtool%\Servicecontrol.exe control LITSSVC %%a
+for %%a in (163 165) do (
 
-    if %%a==135 (
-        set "logname=Balance"
-        echo Successfully set ITS to [ Balance Mode ]
-    ) else if %%a==148 (
+    %logtool%\Servicecontrol.exe control LenovoProcessManagement %%a
+
+    if %%a==163 (
+        set "logname=INT"
+        echo Successfully set Dispatcher to [ Intelligent Mode ]
+    ) else if %%a==165 (
         set "logname=EPM"
-        echo Successfully set ITS to [ EPM Mode ]
+        echo Successfully set Dispatcher to [ EPM Mode ]
     )
     echo Launching PTAT...
-    start /min "" "%PTAT%" "-m=ITS-!logname!-PTAT.csv" "-noappend" "-l=r"
+    start /min "" "%PTAT%" "-m=DSP-!logname!-PTAT.csv" "-noappend" "-l=r"
     echo Launching ML_Scenario...
-    start /min cmd /c "%logtool%\ML_Scenario.exe -delay 1 -logname ITS-!logname!-ML.csv -count 8000 -logonly"
+    start /min cmd /c "%logtool%\ML_Scenario.exe -delay 1 -logname DSP-!logname!-ML.csv -count 8000 -logonly"
     echo All done, Please wait for a while...
 
     timeout /t 20 > nul
@@ -147,7 +137,7 @@ for %%a in (135 148) do (
     for /L %%i IN (1, 1, %looptimes%) do (
         echo Let's go^!
         echo =====[ Current Mode: !logname! ]==== Start Testing... =========[ %%i of %looptimes% ]=========
-        "%_3DMarkPath%\3DMarkCmd.exe" "--definition=timespy.3dmdef" "--out=%logpath%\3dm-result\ITS-!logname!-%%i.3dmark-result" "--export=%logpath%\3dm-result\ITS-!logname!-%%i.xml"
+        "%PCMarkPath%\3DMarkCmd.exe" "--definition=%definitionfile%" "--out=%logpath%\DSP-!logname!.pcmark10-result" "--export-xml=%logpath%\xml-result\DSP-!logname!.xml"
         echo =============================== End Testing... ===============================
         echo Take a break...for %pauseduration% seconds...
         timeout /t 180 > nul
@@ -158,11 +148,11 @@ for %%a in (135 148) do (
     taskkill /F /IM "PTAT.exe" /IM "ML_Scenario.exe"
     echo Successfully terminate PTAT and ML_Scenario^!
 
-    move /Y "%USERPROFILE%\Documents\iPTAT\log\its-!logname!-ptat.csv" "%logpath%"
+    move /Y "%USERPROFILE%\Documents\iPTAT\log\dsp-!logname!-ptat.csv" "%logpath%"
 )
 
 explorer %logpath%
-"%logtool%\xmltocsv.exe" "%logpath%\3dm-result"
+"%logtool%\xmltocsv.exe" "%logpath%\xml-result"
 
 pause
 
