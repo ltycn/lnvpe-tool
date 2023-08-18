@@ -33,20 +33,6 @@ set "logpath=%USERPROFILE%\Desktop\log\Cinebench\ITS-%month%%day%%hour%%minute%"
 mkdir "%logpath%"
 
 
-rem ===== Make sure ITS service running=====
-cd c:\windows\system32
-sc stop LenovoProcessManagement
-TIMEOUT /T 5
-SC config LenovoProcessManagement start=disabled
-TIMEOUT /T 5
-
-SC config LITSSVC start=auto
-TIMEOUT /T 5
-sc start LITSSVC
-TIMEOUT /T 5
-
-cd "%logpath%"
-
 rem ================= Enable Log =====================
 echo Launching PTAT...
 start /min "" "%PTAT%" "-m=CB-%logname%-PTAT.csv" "-noappend" "-l=r"
@@ -103,4 +89,3 @@ for /f "tokens=*" %%a in ('type "%logname%.txt" ^| findstr /C:"%searchString%"')
 )
 type %logname%_Results.txt
 exit /B 0
-
