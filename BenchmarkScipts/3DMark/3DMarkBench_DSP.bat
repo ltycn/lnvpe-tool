@@ -117,10 +117,10 @@ for %%a in (163 165) do (
         set "logname=EPM"
         echo Successfully set Dispatcher to [ EPM Mode ]
     )
-    echo Launching PTAT...
-    start /min "" "%PTAT%" "-m=DSP-!logname!-PTAT.csv" "-noappend" "-l=r"
+    REM echo Launching PTAT...
+    REM start /min "" "%PTAT%" "-m=DSP-!logname!-PTAT.csv" "-noappend" "-l=r"
     echo Launching ML_Scenario...
-    start /min cmd /c "%logtool%\ML_Scenario.exe -delay 1 -logname DSP-!logname!-ML.csv -count 4000 -logonly"
+    start /min cmd /c "%logtool%\ML_Scenario.exe -delay 1 -logname DSP-!logname!-ML.csv -count 50000 -logonly"
     echo All done, Please wait for a while...
 
     timeout /t 20 > nul
@@ -139,7 +139,7 @@ for %%a in (163 165) do (
     taskkill /F /IM "PTAT.exe" /IM "ML_Scenario.exe"
     echo Successfully terminate PTAT and ML_Scenario^!
 
-    move /Y "%USERPROFILE%\Documents\iPTAT\log\dsp-!logname!-ptat.csv" "%logpath%"
+    REM move /Y "%USERPROFILE%\Documents\iPTAT\log\dsp-!logname!-ptat.csv" "%logpath%"
 )
 
 explorer %logpath%
