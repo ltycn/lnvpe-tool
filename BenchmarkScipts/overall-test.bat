@@ -52,6 +52,8 @@ set "logpath=%logrootpath%\overalltest-log\%month%%day%%hour%%minute%"
 mkdir "%logpath%"
 cd %logpath%
 
+"\\VM-SERVER\lnvpe-share\TOOL\AutoCharge.exe" %socketport% 0
+
 rem ////////////////////////////////////////////////////////////////////////////////
 rem ////////////////////////////////////////////////////////////////////////////////
 rem ////////////////////////////////////////////////////////////////////////////////
@@ -124,6 +126,9 @@ timeout /t 20 > nul
 taskkill /F /IM "PTATService.exe"
 echo Successfully terminate PTAT ^!
 move /Y "%USERPROFILE%\Documents\iPTAT\log\Cinebench-PTAT.csv" "%logpath%"
+
+
+"\\VM-SERVER\lnvpe-share\TOOL\AutoCharge.exe" %socketport% 1
 
 pause
 
