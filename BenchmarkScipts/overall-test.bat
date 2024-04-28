@@ -76,6 +76,7 @@ for /L %%i IN (1, 1, %looptimes%) do (
 timeout /t 20 > nul
 taskkill /F /IM "PTATService.exe"
 echo Successfully terminate PTAT ^!
+timeout /t 5 > nul
 move /Y "%USERPROFILE%\Documents\iPTAT\log\PCMark-PTAT.csv" "%logpath%"
 
 rem ////////////////////////////////////////////////////////////////////////////////
@@ -100,6 +101,7 @@ for /L %%i IN (1, 1, %looptimes%) do (
 timeout /t 20 > nul
 taskkill /F /IM "PTATService.exe"
 echo Successfully terminate PTAT ^!
+timeout /t 5 > nul
 move /Y "%USERPROFILE%\Documents\iPTAT\log\3DMark-PTAT.csv" "%logpath%"
 
 rem ////////////////////////////////////////////////////////////////////////////////
@@ -125,6 +127,7 @@ for /L %%i IN (1,1,%looptimes%) do (
 timeout /t 20 > nul
 taskkill /F /IM "PTATService.exe"
 echo Successfully terminate PTAT ^!
+timeout /t 5 > nul
 move /Y "%USERPROFILE%\Documents\iPTAT\log\Cinebench-PTAT.csv" "%logpath%"
 
 
