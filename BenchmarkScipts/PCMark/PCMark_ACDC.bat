@@ -9,14 +9,11 @@ if not "%1"=="am_admin" (
 
 rem Configuration
 set "socketport="
-rem set "looptimes=3"
+set "looptimes=3"
 set "pauseduration=180"
 set "pcmarkdefinitionfile=pcm10_benchmark.pcmdef"
-set "_3dmarkdefinitionfile=timespy.3dmdef"
 set "PTAT=C:\Program Files\Intel Corporation\Intel(R)PTAT\PTAT.exe"
 set "PCMarkPath=C:\Program Files\UL\PCMark 10"
-set "_3DMarkPath=C:\Program Files\UL\3DMark"
-set "CinebenchPath=%USERPROFILE%\Desktop\Cinebench2024"
 set "logrootpath=%USERPROFILE%\Desktop\log"
 
 
@@ -46,37 +43,25 @@ for %%p in (
 rem Create log directory if not exists
 if not exist "%logrootpath%" mkdir "%logrootpath%"
 
+"\\VM-SERVER\lnvpe-share\TOOL\AutoCharge.exe" %socketport%
+
 rem Function to run test
 :runTest
     "\\VM-SERVER\lnvpe-share\TOOL\AutoCharge.exe" %socketport% 0
 
-    rem Loop for EPP values
-    for /L %%i IN (10, 10, 100) do (
-        set "EPP=%%i"
-        Powercfg -setdcvalueindex scheme_current sub_processor PERFEPP1 !EPP!
-        Powercfg -setdcvalueindex scheme_current sub_processor PERFEPP !EPP!
-        Powercfg -setacvalueindex scheme_current sub_processor PERFEPP1 !EPP!
-        Powercfg -setacvalueindex scheme_current sub_processor PERFEPP !EPP!
-        Powercfg -setactive scheme_current
-
-        rem Loop for processor frequency
-        for %%f in (1400 1450 1500 1550 1600 1650 1700 1800 1900 2000 2100 2300 2500 3000 4000 5000) do (
-        Powercfg -setdcvalueindex scheme_current sub_processor PROCFREQMAX %%f
-        Powercfg -setdcvalueindex scheme_current sub_processor PROCFREQMAX1 %%f
-        Powercfg -setacvalueindex scheme_current sub_processor PROCFREQMAX %%f
-        Powercfg -setacvalueindex scheme_current sub_processor PROCFREQMAX1 %%f
-        Powercfg -setactive scheme_current
-
+    for /L %%i IN (1, 1, %looptimes%) do (
         rem Launch PTAT and run tests
-        call :runBench "EPP!EPP!-FREQ%%f" "%logpath%"
+        call :runBench "DC-PCMark-%%i" "%logpath%"
         )
 
-    )
+    "\\VM-SERVER\lnvpe-share\TOOL\AutoCharge.exe" %socketport% 1
 
+    for /L %%j IN (1, 1, %looptimes%) do (
+        rem Launch PTAT and run tests
+        call :runBench "AC-PCMark-%%j" "%logpath%"
+        )
     rem Move logs to logpath
     move /Y "%USERPROFILE%\Documents\iPTAT\log\*" "%logpath%"
-
-    "\\VM-SERVER\lnvpe-share\TOOL\AutoCharge.exe" %socketport% 1
 
 exit /b
 
