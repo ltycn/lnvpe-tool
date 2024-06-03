@@ -23,11 +23,11 @@ rem #########################################################################
 
 for /f "tokens=2 delims==" %%a in ('wmic OS Get localdatetime /value') do set "dt=%%a"
 
-set "year=%dt:~0,4%"
 set "month=%dt:~4,2%"
 set "day=%dt:~6,2%"
 set "hour=%dt:~8,2%"
 set "minute=%dt:~10,2%"
+set "logpath=%logrootpath%\PCMark\%month%%day%%hour%%minute%"
 mkdir "%logpath%" && mkdir "%logpath%\ML" && mkdir "%logpath%\PTAT" && cd "%logpath%"
 
 rem Prevent PC from going into sleep
@@ -42,7 +42,9 @@ for %%p in (
     powercfg /change "%%p" 0
 )
 
-rem Function to run test
+rem #################################################################
+rem ###   Testing Logic Aera   ######################################
+rem #################################################################
 
 :runTest
 
@@ -66,6 +68,13 @@ rem Function to run test
     move /Y "%USERPROFILE%\Documents\iPTAT\log\*" "%logpath%\PTAT"
     move /Y "ML*.csv" "%logpath%\ML"
 
+    rem ========== Auto Charge when battery low ==========
+    rem "%AutoCharge%" %socketport%
+
+    rem ========== Control Power Socket ON/OFF ==========
+    rem "%AutoCharge%" %socketport% 1
+    rem "%AutoCharge%" %socketport% 0
+
     rem ================ Fixed STD Mode =================
     rem net stop "LenovoProcessManagement"
     rem sc config "LenovoProcessManagement" start= disabled
@@ -85,6 +94,11 @@ rem Function to run test
     rem powercfg /setactive 381b4222-f694-41f0-9685-ff5bb260df2e 
 
 exit /b
+
+
+rem #################################################################
+rem ###   Testing Process Aera   ####################################
+rem #################################################################
 
 rem Function to launch PTAT and run tests
 :runBench

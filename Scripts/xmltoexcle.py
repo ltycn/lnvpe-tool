@@ -61,5 +61,5 @@ def xml_to_excel(directory, output_file):
 
 # Example usage:
 directory = input("请输入XML文件所在的目录：")
-output_file = "output.xlsx"
+output_file = os.path.join(directory, 'output.xlsx')
 xml_to_excel(directory, output_file)

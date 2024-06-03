@@ -53,7 +53,7 @@ def process_csv_files(folder_path):
         file_averages[file_name] = column_averages
     
     # 将结果写入Excel文件
-    result_file = 'averages.xlsx'
+    result_file = os.path.join(folder_path, 'averages.xlsx')
     with pd.ExcelWriter(result_file, engine='openpyxl') as writer:  # 设置引擎为openpyxl
         # 在ExcelWriter中创建一个空的工作表
         writer.book.create_sheet(index=0, title='Sheet1')
