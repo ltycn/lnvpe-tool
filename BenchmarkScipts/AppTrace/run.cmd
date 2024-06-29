@@ -55,6 +55,7 @@ for /f "tokens=1,* delims=:" %%a in ('findstr /n "^" "%messageFilePath%"') do (
 
 if not defined message (
     echo Test finished, Existing...
+    "\\VM-SERVER\lnvpe-share\TOOL\AutoCharge.exe" %socketport% 1
     timeout /t 5 /nobreak
     exit /b 1
 )
@@ -79,8 +80,6 @@ timeout /t 10 /nobreak
 
 ::============= DC Battery Check - Auto Charge =============
 "\\VM-SERVER\lnvpe-share\TOOL\AutoCharge.exe" %socketport%
-
-"\\VM-SERVER\lnvpe-share\TOOL\AutoCharge.exe" %socketport% 1
 ::==========================================================
 
 reg add "%runOnceKeyPath%" /v AutoRestartScript /t REG_SZ /d "cmd.exe /c \"%scriptPath%\"" /f
