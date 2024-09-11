@@ -8,12 +8,12 @@ if not "%1"=="am_admin" (
 )
 
 rem ############################# Configuration #############################
-set "socketport="
+set "socketport=2"
 set "looptimes=3"
 set "pauseduration=180"
 
-set "PCMarkPath=C:\Program Files\UL\PCMark 10"
-set "pcmarkdefinitionfile=pcm10_benchmark.pcmdef"
+set "_3DMarkPath=C:\Program Files\UL\3DMark"
+set "_3DMarkdefinitionfile=timespy.3dmdef"
 set "logrootpath=%USERPROFILE%\Desktop\log"
 set "PTAT=C:\Program Files\Intel Corporation\Intel(R)PTAT\PTAT.exe"
 set "AutoCharge=\\VM-SERVER\lnvpe-share\TOOL\AutoCharge.exe"
@@ -22,7 +22,7 @@ rem #########################################################################
 
 for /f "tokens=*" %%a in ('powershell -command "Get-Date -Format yyMMdd-HHmmss"') do set "datetime=%%a"
 
-set "logpath=%logrootpath%\PCMark\%datetime%"
+set "logpath=%logrootpath%\3DMark\%datetime%"
 mkdir "%logpath%" && mkdir "%logpath%\ML" && mkdir "%logpath%\PTAT" && cd "%logpath%"
 
 rem Prevent PC from going into sleep
@@ -43,20 +43,20 @@ rem #################################################################
 
 :runTest
 
-    rem "%AutoCharge%" %socketport%
+    "%AutoCharge%" %socketport%
 
-    rem  "%AutoCharge%" %socketport% 0
+    "%AutoCharge%" %socketport% 0
 
     for /L %%i IN (1, 1, %looptimes%) do (
         rem Launch PTAT and run tests
-        call :runBench "DC-PCMark-%%i" "%logpath%"
+        call :runBench "DC-3DMark-%%i" "%logpath%"
         )
 
     "%AutoCharge%" %socketport% 1
 
     for /L %%j IN (1, 1, %looptimes%) do (
         rem Launch PTAT and run tests
-        call :runBench "AC-PCMark-%%j" "%logpath%"
+        call :runBench "AC-3DMark-%%j" "%logpath%"
         )
 
     rem Move logs to logpath
@@ -107,7 +107,7 @@ rem Function to launch PTAT and run tests
     timeout /t 20 > nul
 
     echo ============ Start Testing... =========[ %testname% of !looptimes! ]=================
-    "%PCMarkPath%\PCMark10Cmd.exe" "--definition=%pcmarkdefinitionfile%" "--out=%logpath%\pcm-%testname%.pcmark10-result" "--export=%logpath%\pcm-%testname%.xml"
+    "%_3DMarkPath%\3DMarkCmd.exe" "--definition=%_3DMarkdefinitionfile%" "--out=%logpath%\%testname%.3dmark-result" "--export=%logpath%\%testname%.xml"
     echo =============================== End Testing... ===============================
     timeout /t 20 > nul
 
