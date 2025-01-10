@@ -18,8 +18,8 @@ set CinebenchPath="%USERPROFILE%\Desktop\CinebenchR23\Cinebench.exe"
 set "pcmarkdefinitionfile=pcm10_benchmark.pcmdef"
 set "logrootpath=%USERPROFILE%\Desktop\log"
 set "PTAT=C:\Program Files\Intel Corporation\Intel(R)PTAT\PTAT.exe"
-set "AutoCharge=\\VM-SERVER\lnvpe-share\TOOL\AutoCharge.exe"
-set "ML_Scenario=\\VM-SERVER\lnvpe-share\TOOL\ML_Scenario\ML_Scenario.exe"
+set "AutoCharge=\\FILE-SERVER\lnvpe-share\TOOL\AutoCharge.exe"
+set "ML_Scenario=\\FILE-SERVER\lnvpe-share\TOOL\ML_Scenario\ML_Scenario.exe"
 rem #########################################################################
 
 
