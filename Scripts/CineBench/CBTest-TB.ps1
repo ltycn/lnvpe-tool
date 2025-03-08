@@ -6,7 +6,7 @@ if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
 
 # ############################# Configuration #############################
 $socketport = ""
-$multicore_looptimes = 50
+$multicore_looptimes = 100
 $pauseduration = 1800
 
 $CinebenchPath = "$env:USERPROFILE\Desktop\CinebenchR23\Cinebench.exe"
@@ -66,16 +66,10 @@ function Run-Bench {
     param (
         [string]$testname,
         [string]$CBConfig,
-        [string]$outputFile
+        [string]$outputFile,
+        [string]$ResultOutputFile
     )
     Write-Host "=========== Start Testing... [$testname] ===========" | Out-File -FilePath $outputFile -Append
-
-    Start-Process -FilePath $ML_Scenario `
-                  -ArgumentList "-delay 1 -logname ML-CB.csv -count 100000 -logonly" `
-                  -WindowStyle Minimized `
-                  -WorkingDirectory $logpath
-
-    Start-Sleep -Seconds 10
 
     $tempFile = New-TemporaryFile
 
@@ -94,11 +88,11 @@ function Run-Bench {
 
     if ($filteredLines) {
         $filteredLines | ForEach-Object { Write-Host $_ }
+        $filteredLines | Out-File -FilePath $ResultOutputFile -Append
     } else {
         Write-Host "No lines containing 'CB' found."
     }
 
-    # 将所有内容写入输出文件
     $lines | Out-File -FilePath $outputFile -Append
     Remove-Item $tempFile
 
@@ -107,10 +101,7 @@ function Run-Bench {
     & $AutoCharge $socketport
 
     Start-Sleep -Seconds $pauseduration
-
-    Stop-Process -Name "ML_Scenario" -Force
 }
-
 
 
 # Main test logic
@@ -119,31 +110,24 @@ function Run-Test {
     New-Item -ItemType File -Path $outputFile -Force | Out-Null
     Write-Host "Log file location: $outputFile"
 
+    Start-Process -FilePath $ML_Scenario `
+                  -ArgumentList "-delay 1 -logname ML-CB.csv -count 100000 -logonly" `
+                  -WindowStyle Minimized `
+                  -WorkingDirectory $logpath
+
     & $AutoCharge $socketport
     & $AutoCharge $socketport 0
 
     for ($i = 1; $i -le $multicore_looptimes; $i++) {
-        Run-Bench -testname "DC-CBTest-$i" -CBConfig "g_CinebenchCpuXTest=true g_CinebenchCpu1Test=false g_CinebenchMinimumTestDuration=1" -outputFile $outputFile
+        Run-Bench -testname "DC-CBTest-$i" -CBConfig "g_CinebenchCpuXTest=true g_CinebenchCpu1Test=false g_CinebenchMinimumTestDuration=1" -outputFile $outputFile -ResultOutputFile "Result.txt"
     }
 
     & $AutoCharge $socketport 1
+
+    Stop-Process -Name "ML_Scenario" -Force
+
     Move-Item -Path "ML*.csv" -Destination "$logpath\ML" -Force
 
-    # Process the log file after testing
-    Process-CinebenchLog
-}
-
-# Process the Cinebench log file and save filtered results
-function Process-CinebenchLog {
-    $logFilePath = Join-Path -Path $logpath -ChildPath "CinebenchTestLog.txt"
-    $resultFilePath = Join-Path -Path $logpath -ChildPath "CinebenchTestResult.txt"
-
-    if (Test-Path $logFilePath) {
-        Get-Content $logFilePath | Where-Object { $_ -match "^CB" } | Out-File -FilePath $resultFilePath -Force
-        Write-Host "Filtered results saved to: $resultFilePath"
-    } else {
-        Write-Host "Log file not found: $logFilePath"
-    }
 }
 
 # Main script execution

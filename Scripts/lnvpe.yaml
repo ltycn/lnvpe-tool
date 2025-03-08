@@ -1,0 +1,180 @@
+port: 7890
+socks-port: 7891
+redir-port: 7892
+tproxy-port: 7893
+allow-lan: false
+bind-address: '*'
+mode: rule
+log-level: error
+find-process-mode: strict
+keep-alive-interval: 300
+unified-delay: true
+external-controller: '127.0.0.1:9090'
+
+dns:
+  enable: true
+  ipv6: false
+  default-nameserver:
+    - 'udp://192.168.1.10'
+  fake-ip-range: 198.18.0.1/16
+  fake-ip-filter:
+    - '*.lan'
+    - '*.linksys.com'
+    - +.pool.ntp.org
+    - localhost.ptlogin2.qq.com
+    - +.lenovo.com
+    - '*.raysync.cloud'
+    - '*.paloaltonetworks.com'
+    - '*.lnvpe.com'
+    - '*.lnvpe.cn'
+  nameserver:
+    - '192.168.1.10'
+
+proxies:
+  - name: '🇭🇰 Hong Kong 01'
+    type: http
+    server: hkhkg01proxy02.sw.lenovo.com
+    port: 3128
+    udp: true
+    username: liuty24
+    password: Tian8149
+    
+  - name: '🇭🇰 Hong Kong 05'
+    type: ss
+    server: 061a43b9-2e7f-93ab-5ed1-8e9e582bd574.ss03.net
+    port: 22355
+    cipher: chacha20-ietf-poly1305
+    password: cda9c622-1efa-4c41-a567-bee41e981a84
+    udp: true
+  - name: '新加坡 - HY2 - 大妮妮'
+    server: ovo.5188666.xyz
+    port: 63518
+    udp: true
+    skip-cert-verify: true
+    sni: ovo.1234567890spcloud.com
+    type: hysteria2
+    password: 054e81ea-7963-4eef-b589-afbdc441e3c3
+
+
+proxy-groups:
+    - { name: '🔰 手动选择', type: select, proxies: ['♻️ 自动选择', '🇭🇰 Hong Kong 01'] }
+    - { name: '📽 Netflix', type: select, proxies: ['🔰 手动选择', '🇭🇰 Hong Kong 01'] }
+    - { name: '📺 Disney+', type: select, proxies: ['🔰 手动选择', '🇭🇰 Hong Kong 01'] }
+    - { name: '🎬 YouTube', type: select, proxies: ['🔰 手动选择', '♻️ 自动选择', '🇭🇰 Hong Kong 01'] }
+    - { name: '📺 Bilibili', type: select, proxies: [DIRECT, '🔰 手动选择', '🇭🇰 Hong Kong 01'] }
+    - { name: '📱 Telegram', type: select, proxies: ['🔰 手动选择', '♻️ 自动选择', '🇭🇰 Hong Kong 01'] }
+    - { name: '📺 动画疯', type: select, proxies: ['🔰 手动选择', '🇭🇰 Hong Kong 01'] }
+    - { name: '⚛️ Ai合集', type: select, proxies: ['🔰 手动选择', '🇭🇰 Hong Kong 01', '🇭🇰 Hong Kong 05', '新加坡 - HY2 - 大妮妮'] }
+    - { name: 'Ⓜ Microsoft', type: select, proxies: [DIRECT, '🔰 手动选择', '♻️ 自动选择', '🇭🇰 Hong Kong 01'] }
+    - { name: '🎯 游戏平台', type: select, proxies: [DIRECT, '🔰 手动选择', '♻️ 自动选择', '🇭🇰 Hong Kong 01'] }
+    - { name: '🍎 Apple', type: select, proxies: [DIRECT, '🔰 手动选择', '♻️ 自动选择', '🇭🇰 Hong Kong 01'] }
+    - { name: '🌎 全球代理', type: select, proxies: ['🔰 手动选择', '♻️ 自动选择', '🇭🇰 Hong Kong 01'] }
+    - { name: '🐟 漏网之鱼', type: select, proxies: [DIRECT, '🔰 手动选择', '♻️ 自动选择', '🇭🇰 Hong Kong 01'] }
+    - { name: '♻️ 自动选择', type: url-test, proxies: ['🇭🇰 Hong Kong 01'], tolerance: 20, lazy: true, url: 'http://www.gstatic.com/generate_204', interval: 300 }
+
+rule-providers:
+    SteamCN: { type: http, behavior: classical, path: ./providers/rule/Games/SteamCN.yaml, url: http://154.17.13.205:32580/ACL4SSR/Clash/Providers/Ruleset/SteamCN.yaml, interval: 21600 }
+    Steam: { type: http, behavior: classical, path: ./providers/rule/Games/Steam.yaml, url: http://154.17.13.205:32580/ACL4SSR/Clash/Providers/Ruleset/Steam.yaml, interval: 21600 }
+    Blizzard: { type: http, behavior: classical, path: ./providers/rule//Games/Blizzard.yaml, url: http://154.17.13.205:32580/Clash/RuleSet/Extra/Game/Blizzard.yaml, interval: 21600 }
+    Nintendo: { type: http, behavior: classical, path: ./providers/rule/Games/Nintendo.yaml, url: http://154.17.13.205:32580/Clash/RuleSet/Extra/Game/Nintendo.yaml, interval: 21600 }
+    Origin: { type: http, behavior: classical, path: ./providers/rule/Games/Origin.yaml, url: http://154.17.13.205:32580/Clash/RuleSet/Extra/Game/Origin.yaml, interval: 21600 }
+    Xbox: { type: http, behavior: classical, path: ./providers/rule/Games/Xbox.yaml, url: http://154.17.13.205:32580/Clash/RuleSet/Extra/Game/Xbox.yaml, interval: 21600 }
+    Epic: { type: http, behavior: classical, path: ./providers/rule/Games/Epic.yaml, url: http://154.17.13.205:32580/ACL4SSR/Clash/Providers/Ruleset/Epic.yaml, interval: 21600 }
+    Apple: { type: http, behavior: classical, path: ./providers/rule/Apple.yaml, url: http://154.17.13.205:32580/ACL4SSR/Clash/Providers/Ruleset/Apple.yaml, interval: 21600 }
+    Telegram: { type: http, behavior: classical, path: ./providers/rule/Telegram.yaml, url: http://154.17.13.205:32580/ACL4SSR/Clash/Providers/Ruleset/Telegram.yaml, interval: 21600 }
+    Microsoft: { type: http, behavior: classical, path: ./providers/rule/Microsoft.yaml, url: http://154.17.13.205:32580/ACL4SSR/Clash/Providers/Ruleset/Microsoft.yaml, interval: 21600 }
+    Claude: { type: http, behavior: classical, path: ./providers/rule/Claude.yaml, url: http://154.17.13.205:32580/ACL4SSR/Clash/Providers/Ruleset/Claude.yaml, interval: 21600 }
+    Bilibili: { type: http, behavior: classical, path: ./providers/rule/Bilibili.yaml, url: http://154.17.13.205:32580/ACL4SSR/Clash/Providers/Ruleset/Bilibili.yaml, interval: 21600 }
+    YouTube: { type: http, behavior: classical, path: ./providers/rule/YouTube.yaml, url: http://154.17.13.205:32580/ACL4SSR/Clash/Providers/Ruleset/YouTube.yaml, interval: 21600 }
+    Netflix: { type: http, behavior: classical, path: ./providers/rule/Netflix.yaml, url: http://154.17.13.205:32580/ACL4SSR/Clash/Providers/Ruleset/Netflix.yaml, interval: 21600 }
+    Disney: { type: http, behavior: classical, path: ./providers/rule/Disney.yaml, url: http://154.17.13.205:32580/ACL4SSR/Clash/Providers/Ruleset/DisneyPlus.yaml, interval: 21600 }
+    Bahamut: { type: http, behavior: classical, path: ./providers/rule/Bahamut.yaml, url: http://154.17.13.205:32580/Clash/RuleSet/StreamingMedia/Video/Bahamut.yaml, interval: 21600 }
+    TikTok: { type: http, behavior: classical, path: ./providers/rule/TikTok.yaml, url: http://154.17.13.205:32580/ACL4SSR/Clash/Providers/Ruleset/TikTok.yaml }
+    ProxyMedia: { type: http, behavior: classical, path: ./providers/rule/ProxyMedia.yaml, url: http://154.17.13.205:32580/ACL4SSR/Clash/Providers/ProxyMedia.yaml, interval: 21600 }
+    ProxyGFWlist: { type: http, behavior: classical, path: ./providers/rule/ProxyGFWlist.yaml, url: http://154.17.13.205:32580/ACL4SSR/Clash/Providers/ProxyGFWlist.yaml, interval: 21600 }
+    Global: { type: http, behavior: classical, path: ./providers/rule/Global.yaml, url: http://154.17.13.205:32580/Clash/RuleSet/Global.yaml, interval: 21600 }
+    ChinaDomain: { type: http, behavior: classical, path: ./providers/rule/ChinaDomain.yaml, url: http://154.17.13.205:32580/ACL4SSR/Clash/Providers/ChinaDomain.yaml, interval: 21600 }
+    ChinaIp: { type: http, behavior: ipcidr, path: ./providers/rule/ChinaIp.yaml, url: http://154.17.13.205:32580/ACL4SSR/Clash/Providers/ChinaIp.yaml, interval: 21600 }
+
+rules:
+    - 'DOMAIN,sub.sslinks.co.in,DIRECT'
+    - 'IP-CIDR,192.168.0.0/16,DIRECT,no-resolve'
+    - 'IP-CIDR,10.0.0.0/8,DIRECT,no-resolve'
+    - 'IP-CIDR,172.16.0.0/12,DIRECT,no-resolve'
+    - 'IP-CIDR,127.0.0.0/8,DIRECT,no-resolve'
+    - 'IP-CIDR,100.64.0.0/10,DIRECT,no-resolve'
+    - 'IP-CIDR6,::1/128,DIRECT,no-resolve'
+    - 'IP-CIDR6,fc00::/7,DIRECT,no-resolve'
+    - 'IP-CIDR6,fe80::/10,DIRECT,no-resolve'
+    - 'IP-CIDR6,fd00::/8,DIRECT,no-resolve'
+    - 'DOMAIN-SUFFIX,cm.steampowered.com,DIRECT'
+    - 'DOMAIN-SUFFIX,steamserver.net,DIRECT'
+    - 'DOMAIN-SUFFIX,steamcontent.com,DIRECT'
+    - 'DOMAIN-SUFFIX,dl.steam.clngaa.com,DIRECT'
+    - 'DOMAIN-SUFFIX,dl.steam.ksyna.com,DIRECT'
+    - 'DOMAIN-SUFFIX,st.dl.bscstorage.net,DIRECT'
+    - 'DOMAIN-SUFFIX,st.dl.eccdnx.com,DIRECT'
+    - 'DOMAIN-SUFFIX,st.dl.pinyuncloud.com,DIRECT'
+    - 'DOMAIN-SUFFIX,cdn.mileweb.cs.steampowered.com.8686c.com,DIRECT'
+    - 'DOMAIN-SUFFIX,cdn-ws.content.steamchina.com,DIRECT'
+    - 'DOMAIN-SUFFIX,cdn-qc.content.steamchina.com,DIRECT'
+    - 'DOMAIN-SUFFIX,cdn-ali.content.steamchina.com,DIRECT'
+    - 'RULE-SET,SteamCN,DIRECT'
+    - 'IP-CIDR,91.108.4.0/22,📱 Telegram,no-resolve'
+    - 'IP-CIDR,91.108.8.0/22,📱 Telegram,no-resolve'
+    - 'IP-CIDR,91.108.56.0/22,📱 Telegram,no-resolve'
+    - 'IP-CIDR,95.161.64.0/20,📱 Telegram,no-resolve'
+    - 'IP-CIDR,149.154.160.0/22,📱 Telegram,no-resolve'
+    - 'IP-CIDR,149.154.160.0/23,📱 Telegram,no-resolve'
+    - 'IP-CIDR,149.154.162.0/23,📱 Telegram,no-resolve'
+    - 'IP-CIDR,149.154.164.0/22,📱 Telegram,no-resolve'
+    - 'IP-CIDR,149.154.164.0/23,📱 Telegram,no-resolve'
+    - 'IP-CIDR,149.154.166.0/23,📱 Telegram,no-resolve'
+    - 'RULE-SET,Telegram,📱 Telegram'
+    - 'DOMAIN-SUFFIX,telegram.org,📱 Telegram'
+    - 'RULE-SET,Netflix,📽 Netflix'
+    - 'RULE-SET,Disney,📺 Disney+'
+    - 'RULE-SET,YouTube,🎬 YouTube'
+    - 'RULE-SET,Bilibili,📺 Bilibili'
+    - 'RULE-SET,Bahamut,📺 动画疯'
+    - 'DOMAIN-SUFFIX,imgaes.ctfassets.net,⚛️ Ai合集'
+    - 'DOMAIN-SUFFIX,featureassets.org,⚛️ Ai合集'
+    - 'DOMAIN-SUFFIX,prodregistryv2.org,⚛️ Ai合集'
+    - 'DOMAIN-SUFFIX,cdn.oaistatic.com,⚛️ Ai合集'
+    - 'DOMAIN-SUFFIX,o33249.ingest.us.sentry.io,⚛️ Ai合集'
+    - 'DOMAIN-SUFFIX,openai.com,⚛️ Ai合集'
+    - 'DOMAIN-SUFFIX,browser-intake-datadoghq.com,⚛️ Ai合集'
+    - 'DOMAIN-SUFFIX,chatgpt.com,⚛️ Ai合集'
+    - 'DOMAIN-SUFFIX,livekit.cloud,⚛️ Ai合集'
+    - 'DOMAIN-SUFFIX,oaiusercontent.com,⚛️ Ai合集'
+    - 'DOMAIN-SUFFIX,s.gravatar.com,⚛️ Ai合集'
+    - 'DOMAIN-SUFFIX,i1.wp.com,⚛️ Ai合集'
+    - 'DOMAIN-SUFFIX,auth0.com,⚛️ Ai合集'
+    - 'RULE-SET,Claude,⚛️ Ai合集'
+    - 'DOMAIN-SUFFIX,poe.com,⚛️ Ai合集'
+    - 'DOMAIN-SUFFIX,perplexity.ai,⚛️ Ai合集'
+    - 'RULE-SET,Microsoft,Ⓜ Microsoft'
+    - 'RULE-SET,Apple,🍎 Apple'
+    - 'RULE-SET,Steam,🎯 游戏平台'
+    - 'RULE-SET,Blizzard,🎯 游戏平台'
+    - 'RULE-SET,Nintendo,🎯 游戏平台'
+    - 'RULE-SET,Origin,🎯 游戏平台'
+    - 'DOMAIN-SUFFIX,ea.com,🎯 游戏平台'
+    - 'RULE-SET,Xbox,🎯 游戏平台'
+    - 'RULE-SET,Epic,🎯 游戏平台'
+    - 'DOMAIN-SUFFIX,wetv.vip,🌎 全球代理'
+    - 'DOMAIN-SUFFIX,services.googleapis.cn,🌎 全球代理'
+    - 'DOMAIN-SUFFIX,max.com,🌎 全球代理'
+    - 'DOMAIN-SUFFIX,discomax.com,🌎 全球代理'
+    - 'RULE-SET,TikTok,🌎 全球代理'
+    - 'RULE-SET,ProxyMedia,🌎 全球代理'
+    - 'RULE-SET,ProxyGFWlist,🌎 全球代理'
+    - 'RULE-SET,Global,🌎 全球代理'
+    - 'DOMAIN-SUFFIX,cnlang.org,DIRECT'
+    - 'DOMAIN-SUFFIX,atlassian.com,DIRECT'
+    - 'DOMAIN-SUFFIX,download.parallels.com,DIRECT'
+    - 'RULE-SET,ChinaDomain,DIRECT'
+    - 'RULE-SET,ChinaIp,DIRECT'
+    - 'GEOIP,LAN,DIRECT'
+    - 'GEOIP,CN,DIRECT'
+    - 'MATCH,🐟 漏网之鱼'
